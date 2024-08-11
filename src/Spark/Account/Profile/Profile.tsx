@@ -1,25 +1,54 @@
-import React from 'react';
+// File Path: src/Spark/Account/Profile/Profile.tsx
+
+import React, {useEffect, useState} from 'react';
 import * as client from "../client";
-import {useEffect, useState} from "react";
-import {useNavigate} from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 import {useDispatch, useSelector} from "react-redux";
 import {setCurrentUser} from "../reducer";
 
 export default function Profile() {
+    const {uid} = useParams();
     const {currentUser} = useSelector((state: any) => state.accountReducer);
     const [profile, setProfile] = useState<any>({});
+    const [isEditable, setIsEditable] = useState(false);
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
     const fetchProfile = async () => {
         try {
-            // const account = await client.profile();
-            setProfile(currentUser);
+            let fetchedProfile;
+            if (uid) {
+                fetchedProfile = await client.getUserProfile(uid);
+            } else {
+                fetchedProfile = await client.profile();
+            }
+            setProfile(fetchedProfile);
+            setIsEditable(canEdit(currentUser, fetchedProfile));
         } catch (err: any) {
             console.log("DEBUG: Profile.tsx -> fetchProfile -> err", err);
             navigate("/Account/Signin");
         }
     };
+
+    /*const updateProfile = async () => {
+        try {
+            await client.updateProfile(profile);
+            dispatch(setCurrentUser(profile));
+        } catch (err: any) {
+            console.log("DEBUG: Profile.tsx -> updateProfile -> err", err);
+        }
+    };
+
+    const deleteProfile = async () => {
+        if (window.confirm("Are you sure you want to delete this profile?")) {
+            try {
+                await client.deleteProfile(profile._id);
+                navigate("/Account/Signin");
+            } catch (err: any) {
+                console.log("DEBUG: Profile.tsx -> deleteProfile -> err", err);
+            }
+        }
+    };*/
 
     const signout = async () => {
         await client.signout();
@@ -29,40 +58,80 @@ export default function Profile() {
 
     useEffect(() => {
         fetchProfile();
-    }, []);
+    }, [uid]);
 
+    const canEdit = (currentUser: any, profileUser: any) => {
+        return currentUser.role === 'ADMIN' || currentUser._id === profileUser._id;
+    };
 
-    return (<div className="wd-profile-screen">
-        <h1>Profile</h1>
-        {profile &&
-            (<div className="container mt-4">
-                <input className="wd-username form-control mb-3" value={profile.username}
-                       onChange={(e) => setProfile({...profile, username: e.target.value})}/>
-                <input className="wd-password form-control mb-3" value={profile.password}
-                       onChange={(e) => setProfile({...profile, password: e.target.value})}/>
-                <input className="wd-firstname form-control mb-3" value={profile.firstName}
-                       onChange={(e) => setProfile({...profile, firstName: e.target.value})}/>
-                <input className="wd-lastname form-control mb-3" value={profile.lastName}
-                       onChange={(e) => setProfile({...profile, lastName: e.target.value})}/>
-                <input className="wd-dob form-control mb-3" value={profile.dob}
-                       onChange={(e) => setProfile({...profile, dob: e.target.value})} type="date"/>
-                <input className="wd-email form-control mb-3" value={profile.email}
-                       onChange={(e) => setProfile({...profile, email: e.target.value})}/>
-                <select className="wd-role form-control mb-3"
-                        onChange={(e) => setProfile({...profile, role: e.target.value})}>
-                    <option value="USER">User</option>
-                    <option value="ADMIN">Admin</option>
-                    <option value="VIP">VIP</option>
-                    <option value="INFLUENCER">Influencer</option>
-                </select>
-                <button onClick={signout} id={"wd-signout-btn"} className="btn btn-danger w-100">
-                    Sign out
-                </button>
+    const canViewFull = (currentUser: any, profileUser: any) => {
+        return ['ADMIN', 'VIP'].includes(currentUser.role) || currentUser._id === profileUser._id;
+    };
 
+    const renderField = (label: string, value: string, fieldName: string) => {
+        const canViewField = canViewFull(currentUser, profile) || ['username', 'firstName', 'lastName'].includes(fieldName);
+        if (!canViewField) return null;
 
+        return (
+            <div className="mb-3">
+                <label className="form-label">{label}</label>
+                <input
+                    className={`form-control wd-${fieldName.toLowerCase()}`}
+                    value={value}
+                    onChange={(e) => setProfile({...profile, [fieldName]: e.target.value})}
+                    readOnly={!isEditable}
+                />
+            </div>
+        );
+    };
 
+    return (
+        <div className="wd-profile-screen">
+            <h1>{profile.username}'s Profile</h1>
+            {profile && (
+                <div className="container mt-4">
+                    {renderField("Username", profile.username, "username")}
+                    {renderField("First Name", profile.firstName, "firstName")}
+                    {renderField("Last Name", profile.lastName, "lastName")}
+                    {renderField("Email", profile.email, "email")}
+                    {renderField("Date of Birth", profile.dob, "dob")}
 
-            </div>)}
-    </div>);
+                    {isEditable && (
+                        <div className="mb-3">
+                            <label className="form-label">Role</label>
+                            <select
+                                className="form-control wd-role"
+                                value={profile.role}
+                                onChange={(e) => setProfile({...profile, role: e.target.value})}
+                            >
+                                <option value="USER">User</option>
+                                <option value="VIP">VIP</option>
+                                <option value="ADMIN">Admin</option>
+                            </select>
+                        </div>
+                    )}
 
+                    {/*{isEditable && (
+                        <>
+                            <button onClick={updateProfile} className="btn btn-primary w-100 mb-2">
+                                Update Profile
+                            </button>
+                            {currentUser.role === 'ADMIN' && currentUser._id !== profile._id && (
+                                <button onClick={deleteProfile} className="btn btn-danger w-100 mb-2">
+                                    Delete Profile
+                                </button>
+                            )}
+                        </>
+                    )}*/}
+
+                    {currentUser._id === profile._id && (
+                        <button onClick={signout} id="wd-signout-btn" className="btn btn-warning w-100">
+                            Sign out
+                        </button>
+                    )}
+                </div>
+            )}
+        </div>
+    );
 }
+

@@ -63,23 +63,7 @@ export default function SparkLanding() {
 
     return (
         <div className="container-fluid mt-5 h-full d-flex flex-column">
-            {/*<div className="row py-3">
-                <div className="col-6">
-                    <Link to="/" className="text-decoration-none">
-                        <div className="fs-1 fw-bold">
-                            <span className="text-danger">S</span>
-                            <span className="text-success">p</span>
-                            <span className="text-primary">a</span>
-                            <span className="text-warning">r</span>
-                            <span className="text-info">k</span>
-                        </div>
-                    </Link>
-                </div>
-                <div className="col-6 text-end">
-                    <Link to="/Account/Signin" className="btn btn-outline-success me-2">Sign in</Link>
-                    <Link to="/Account/Signup" className="btn btn-outline-primary">Sign up</Link>
-                </div>
-            </div>*/}
+
             <div className="row flex-grow-1">
                 <div className="col-12 col-lg-10 mx-auto d-flex flex-column justify-content-center">
                     <form className="d-flex mb-4">
