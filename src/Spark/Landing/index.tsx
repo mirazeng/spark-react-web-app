@@ -1,7 +1,7 @@
 import React from 'react';
 import {Link} from 'react-router-dom';
 
-export default function SearchLanding() {
+export default function SparkLanding() {
     const recipeData = [
         {
             id: 1,
@@ -62,8 +62,8 @@ export default function SearchLanding() {
     ];
 
     return (
-        <div className="container-fluid min-vh-100 d-flex flex-column">
-            <div className="row py-3">
+        <div className="container-fluid mt-5 h-full d-flex flex-column">
+            {/*<div className="row py-3">
                 <div className="col-6">
                     <Link to="/" className="text-decoration-none">
                         <div className="fs-1 fw-bold">
@@ -79,8 +79,7 @@ export default function SearchLanding() {
                     <Link to="/Account/Signin" className="btn btn-outline-success me-2">Sign in</Link>
                     <Link to="/Account/Signup" className="btn btn-outline-primary">Sign up</Link>
                 </div>
-            </div>
-
+            </div>*/}
             <div className="row flex-grow-1">
                 <div className="col-12 col-lg-10 mx-auto d-flex flex-column justify-content-center">
                     <form className="d-flex mb-4">

@@ -18,7 +18,7 @@ export default function Signin() {
             const currentUser = await client.signin(credentials);
             dispatch(setCurrentUser(currentUser));
             /*TODO: Update here once Profile component is created*/
-            navigate("/Profile");
+            navigate("/Account/Profile");
         } catch (err: any) {
             setError(err.response.data.message || "An error occurred during sign in");
         }
@@ -51,7 +51,7 @@ export default function Signin() {
                         required
                     />
                 </div>
-                <button type="submit" className="btn btn-primary w-100">Sign in</button>
+                <button id={"wd-signin-btn"} type="submit" className="btn btn-primary w-100 mb-2">Sign in</button>
             </form>
             <div className="mt-3">
                 <Link to="/Account/Signup">Don't Have An Account? Sign Up Today! </Link>
