@@ -12,7 +12,7 @@ export default function Session({children}: { children: any }) {
             console.log("DEBUG: Session.tsx -> fetchProfile -> currentUser", currentUser);
             dispatch(setCurrentUser(currentUser));
         } catch (err: any) {
-            console.error(err);
+            console.error("DEBUG: Session.tsx -> fetchProfile -> currentUser -> err", err);
         }
         setPending(false);
     };
