@@ -98,7 +98,7 @@ export default function SparkLanding() {
                                     </div>
                                     <div className="card-footer p-2">
                                         <small className="text-muted">
-                                            By: <Link to={`/user/${recipe.creator}`}
+                                            By: <Link to={`/Account/Profile/${recipe.creator}`}
                                                       className="text-decoration-none">{recipe.creator}</Link>
                                         </small>
                                     </div>
