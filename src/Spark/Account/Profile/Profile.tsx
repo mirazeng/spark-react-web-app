@@ -30,7 +30,7 @@ export default function Profile() {
         }
     };
 
-    /*const updateProfile = async () => {
+    const updateProfile = async () => {
         try {
             await client.updateProfile(profile);
             dispatch(setCurrentUser(profile));
@@ -48,7 +48,7 @@ export default function Profile() {
                 console.log("DEBUG: Profile.tsx -> deleteProfile -> err", err);
             }
         }
-    };*/
+    };
 
     const signout = async () => {
         await client.signout();
@@ -58,19 +58,34 @@ export default function Profile() {
 
     useEffect(() => {
         fetchProfile();
-    }, [uid]);
+    }, [uid, fetchProfile]);
 
     const canEdit = (currentUser: any, profileUser: any) => {
-        return currentUser.role === 'ADMIN' || currentUser._id === profileUser._id;
+        try {
+            return currentUser.role === 'ADMIN' || currentUser._id === profileUser._id;
+        } catch (e) {
+            console.log("DEBUG: Profile.tsx -> canEdit -> e", e);
+            return false;
+        }
     };
 
     const canViewFull = (currentUser: any, profileUser: any) => {
-        return ['ADMIN', 'VIP'].includes(currentUser.role) || currentUser._id === profileUser._id;
+        try {
+            return ['ADMIN', 'VIP'].includes(currentUser.role) || currentUser._id === profileUser._id;
+        } catch (err) {
+            console.log("DEBUG: Profile.tsx -> canViewFull -> err", err);
+            return false;
+        }
     };
 
     const renderField = (label: string, value: string, fieldName: string) => {
-        const canViewField = canViewFull(currentUser, profile) || ['username', 'firstName', 'lastName'].includes(fieldName);
-        if (!canViewField) return null;
+        try {
+            const canViewField = canViewFull(currentUser, profile) || ['username', 'firstName', 'lastName'].includes(fieldName);
+            if (!canViewField) return null;
+        } catch (e) {
+            console.log("DEBUG: Profile.tsx -> renderField -> e", e);
+            return null;
+        }
 
         return (
             <div className="mb-3">
@@ -91,8 +106,8 @@ export default function Profile() {
             {profile && (
                 <div className="container mt-4">
                     {renderField("Username", profile.username, "username")}
-                    {renderField("First Name", profile.firstName, "firstName")}
-                    {renderField("Last Name", profile.lastName, "lastName")}
+                    {renderField("First Name", profile["first_name"], "firstName")}
+                    {renderField("Last Name", profile["last_name"], "lastName")}
                     {renderField("Email", profile.email, "email")}
                     {renderField("Date of Birth", profile.dob, "dob")}
 
@@ -111,7 +126,7 @@ export default function Profile() {
                         </div>
                     )}
 
-                    {/*{isEditable && (
+                    {isEditable && (
                         <>
                             <button onClick={updateProfile} className="btn btn-primary w-100 mb-2">
                                 Update Profile
@@ -122,7 +137,7 @@ export default function Profile() {
                                 </button>
                             )}
                         </>
-                    )}*/}
+                    )}
 
                     {currentUser._id === profile._id && (
                         <button onClick={signout} id="wd-signout-btn" className="btn btn-warning w-100">
@@ -130,6 +145,9 @@ export default function Profile() {
                         </button>
                     )}
                 </div>
+
+                /*TODO: Add the three views */
+
             )}
         </div>
     );

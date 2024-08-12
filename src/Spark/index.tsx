@@ -45,6 +45,22 @@ function Navigation() {
     );
 }
 
+function Footer() {
+    /* My Full name, link to frontend and backend github repo */
+    return (
+        <>
+
+            <div className=" row mt-2 mx-5">
+                <hr></hr>
+                <h2> Miranda Zeng </h2>
+                <a href={"https://github.com/mirazeng/spark-react-web-app"}> React Frontend Repo Link </a>
+                <a href={"https://github.com/mirazeng/spark-server-app"}> Node Backend Repo Link</a>
+
+            </div>
+        </>
+    )
+}
+
 export default function Spark() {
     return (
         <Session>
@@ -57,6 +73,7 @@ export default function Spark() {
                     <Route path="*" element={<Navigate to="Home"/>}/>
                 </Routes>
             </div>
+            <Footer/>
         </Session>
     );
 }

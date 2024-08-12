@@ -31,13 +31,12 @@ export const getUserProfile = async (uid: string) => {
     return response.data;
 }
 
-/*
 export const deleteProfile = async (userId: string) => {
-    const response = await axios.delete(`${USERS_API}${userId}`);
+    const response = await axios.delete(`${USERS_API}/${userId}`);
     return response.data;
 };
 
 export const updateProfile = async (profile: any) => {
-    const response = await axios.put(`${USERS_API}${profile._id}`, profile);
+    const response = await axios.put(`${USERS_API}/${profile._id}`, profile);
     return response.data;
-};*/
+};
