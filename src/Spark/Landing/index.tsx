@@ -1,87 +1,91 @@
-import React from 'react';
-import {Link} from 'react-router-dom';
+// File Path: src/Spark/Landing/index.tsx
+import React, {useEffect, useState} from 'react';
+import {Link, useNavigate} from 'react-router-dom';
+import * as client from "../client";
+
+interface Recipe {
+    _id: string;
+    name: string;
+    imagePath: string;
+    creator: string;
+    description: string;
+}
 
 export default function SparkLanding() {
-    const recipeData = [
-        {
-            id: 1,
-            name: "Homemade Pizza",
-            image: "pizza.jpg",
-            creator: "JohnDoe",
-            description: "Delicious homemade pizza with fresh ingredients."
-        },
-        {
-            id: 2,
-            name: "Veggie Stir-Fry",
-            image: "stirfry.jpg",
-            creator: "AliceSmith",
-            description: "Quick and healthy vegetable stir-fry."
-        },
-        {
-            id: 3,
-            name: "Chocolate Cake",
-            image: "cake.jpg",
-            creator: "BakeMaster",
-            description: "Rich and moist chocolate cake for any occasion."
-        },
-        {
-            id: 4,
-            name: "Grilled Salmon",
-            image: "salmon.jpg",
-            creator: "SeafoodLover",
-            description: "Perfectly grilled salmon with lemon and herbs."
-        },
-        {
-            id: 5,
-            name: "Spaghetti Carbonara",
-            image: "carbonara.jpg",
-            creator: "PastaFan",
-            description: "Classic Italian pasta dish with creamy sauce."
-        },
-        {
-            id: 6,
-            name: "Berry Smoothie",
-            image: "smoothie.jpg",
-            creator: "HealthyEats",
-            description: "Refreshing smoothie packed with antioxidants."
-        },
-        {
-            id: 7,
-            name: "Beef Tacos",
-            image: "tacos.jpg",
-            creator: "MexicanFoodie",
-            description: "Spicy beef tacos with fresh toppings."
-        },
-        {
-            id: 8,
-            name: "Mushroom Risotto",
-            image: "risotto.jpg",
-            creator: "ItalianChef",
-            description: "Creamy risotto with wild mushrooms."
+    const [recipes, setRecipes] = useState<Recipe[]>([]);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [searchCriteria, setSearchCriteria] = useState('name');
+    const navigate = useNavigate();
+
+
+    useEffect(() => {
+        fetchRecipes();
+    }, []);
+
+    const fetchRecipes = async () => {
+        try {
+            const data = await client.getAllRecipes();
+            setRecipes(data);
+            console.log("DEBUG: SparkLanding -> fetchRecipes -> data", data);
+        } catch (error) {
+            console.error('Error fetching recipes:', error);
         }
-    ];
+    };
+
+    const handleSearch = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        try {
+            let data;
+            switch (searchCriteria) {
+                case 'name':
+                    data = await client.searchRecipesByName(searchQuery);
+                    break;
+                case 'creator':
+                    data = await client.searchRecipesByCreator(searchQuery);
+                    break;
+                case 'ingredient':
+                    data = await client.searchRecipesByIngredient(searchQuery);
+                    break;
+                default:
+                    data = await client.searchRecipes(searchQuery);
+            }
+            navigate(`/Results?query=${encodeURIComponent(searchQuery)}&criteria=${searchCriteria}`, {state: {recipes: data}});
+        } catch (error) {
+            console.error('Error searching recipes:', error);
+        }
+    };
 
     return (
         <div className="container-fluid mt-5 h-full d-flex flex-column">
-
             <div className="row flex-grow-1">
                 <div className="col-12 col-lg-10 mx-auto d-flex flex-column justify-content-center">
-                    <form className="d-flex mb-4">
+                    <form className="d-flex mb-4" onSubmit={handleSearch}>
+                        <select
+                            className="form-select me-2"
+                            value={searchCriteria}
+                            onChange={(e) => setSearchCriteria(e.target.value)}
+                        >
+                            <option value="name">Name</option>
+                            <option value="creator">Creator</option>
+                            <option value="ingredient">Ingredient</option>
+                        </select>
                         <input
                             className="form-control form-control-lg me-2"
                             type="search"
-                            placeholder="Search recipes..."
+                            placeholder={`Search recipes by ${searchCriteria}...`}
                             aria-label="Search"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
                         />
                         <button className="btn btn-danger btn-lg" type="submit">Go</button>
                     </form>
 
                     <div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3">
-                        {recipeData.map((recipe) => (
-                            <div className="col" key={recipe.id}>
+                        {recipes.map((recipe) => (
+                            <div className="col" key={recipe._id}>
                                 <div className="card h-100 shadow-sm">
                                     <img
-                                        src={`/images/${recipe.image}`}
+                                        src={recipe.imagePath}
                                         className="card-img-top"
                                         alt={recipe.name}
                                         style={{height: '120px', objectFit: 'cover'}}
@@ -92,7 +96,8 @@ export default function SparkLanding() {
                                            style={{height: '3em', overflow: 'hidden'}}>
                                             {recipe.description}
                                         </p>
-                                        <Link to={`/recipe/${recipe.id}`} className="btn btn-sm btn-outline-info">
+                                        <Link to={`/RecipeDetail/${recipe._id}`}
+                                              className="btn btn-sm btn-outline-info">
                                             View
                                         </Link>
                                     </div>

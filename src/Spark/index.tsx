@@ -1,15 +1,46 @@
-// File path: src/Spark/index.tsx
 
-import {Route, Routes, Navigate, Link} from "react-router-dom";
+import {Route, Routes, Navigate, Link, useNavigate, useLocation} from "react-router-dom";
 import SparkLanding from "./Landing";
 import Account from "./Account";
 import {useSelector} from "react-redux";
 import Session from "./Account/Session";
-import React from "react";
+import React, {useState} from "react";
 import {FaBookmark} from 'react-icons/fa';
+import SearchResults from "./Result";
+import RecipeDetail from "./Details";
+import * as client from "./client";
 
 function Navigation() {
     const {currentUser} = useSelector((state: any) => state.accountReducer);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [searchCriteria, setSearchCriteria] = useState('name');
+    const navigate = useNavigate();
+    const location = useLocation();
+
+    const isLandingPage = location.pathname === '/' || location.pathname === '/Home';
+
+    const handleSearch = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        try {
+            let data;
+            switch (searchCriteria) {
+                case 'name':
+                    data = await client.searchRecipesByName(searchQuery);
+                    break;
+                case 'creator':
+                    data = await client.searchRecipesByCreator(searchQuery);
+                    break;
+                case 'ingredient':
+                    data = await client.searchRecipesByIngredient(searchQuery);
+                    break;
+                default:
+                    data = await client.searchRecipes(searchQuery);
+            }
+            navigate(`/Results?query=${encodeURIComponent(searchQuery)}&criteria=${searchCriteria}`, {state: {recipes: data}});
+        } catch (error) {
+            console.error('Error searching recipes:', error);
+        }
+    };
 
     return (
         <div className="row mt-2 mx-5">
@@ -25,6 +56,29 @@ function Navigation() {
                 </Link>
             </div>
             <div className="col-6 text-end d-flex justify-content-end align-items-center">
+                {!isLandingPage && (
+                    <form className="d-flex me-2" onSubmit={handleSearch}>
+                        <select
+                            className="form-select me-2"
+                            value={searchCriteria}
+                            onChange={(e) => setSearchCriteria(e.target.value)}
+                            style={{width: 'auto'}}
+                        >
+                            <option value="name">Name</option>
+                            <option value="creator">Creator</option>
+                            <option value="ingredient">Ingredient</option>
+                        </select>
+                        <input
+                            className="form-control me-2"
+                            type="search"
+                            placeholder={`Search by ${searchCriteria}...`}
+                            aria-label="Search"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                        />
+                        <button className="btn btn-outline-success" type="submit">Search</button>
+                    </form>
+                )}
                 {currentUser ? (
                     <>
                         <Link to="/Account/Profile" className="btn btn-outline-primary me-2">
@@ -67,10 +121,12 @@ export default function Spark() {
             <Navigation/>
             <div id="wd-spark">
                 <Routes>
+                    <Route path="*" element={<Navigate to="Home"/>}/>
                     <Route path="/" element={<SparkLanding/>}/>
                     <Route path="Home" element={<SparkLanding/>}/>
                     <Route path="Account/*" element={<Account/>}/>
-                    <Route path="*" element={<Navigate to="Home"/>}/>
+                    <Route path={"Results/*"} element={<SearchResults/>}/>
+                    <Route path="RecipeDetail/:recipeID" element={<RecipeDetail/>}/>
                 </Routes>
             </div>
             <Footer/>
