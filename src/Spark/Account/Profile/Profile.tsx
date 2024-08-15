@@ -25,10 +25,18 @@ export default function Profile() {
     const fetchProfile = async () => {
         try {
             let fetchedProfile;
-            if (username === 'self' || !username || username === currentUser.username) {
+            /*if (username === 'self' || !username || username === currentUser.username) {
+                fetchedProfile = await client.profile();*/
+            if (username === 'self') {
+                if (!currentUser) {
+                    navigate("/Account/Signin");
+                    return;
+                }
                 fetchedProfile = await client.profile();
             } else {
-                fetchedProfile = await client.getUserProfile(username);
+                if (typeof username === "string") {
+                    fetchedProfile = await client.getUserProfile(username);
+                }
             }
             setProfile(fetchedProfile);
             setEditedProfile(fetchedProfile);
