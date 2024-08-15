@@ -1,7 +1,11 @@
 import React, {useEffect, useState} from 'react';
 import {useParams, Link} from 'react-router-dom';
-import {getRecipeById, getRecipesByCreator, incrementLikes} from './client';
+import {
+    getRecipeById, searchRecipesByCreator
+    , incrementLikes
+} from '../recipe-client';
 import {FaHeart, FaClock} from 'react-icons/fa';
+import {useSelector} from "react-redux";
 
 interface Recipe {
     _id: string;
@@ -20,6 +24,8 @@ export default function RecipeDetail() {
     const [recipe, setRecipe] = useState<Recipe | null>(null);
     const [relatedRecipes, setRelatedRecipes] = useState<Recipe[]>([]);
     const [isLiking, setIsLiking] = useState(false);
+    const {currentUser} = useSelector((state: any) => state.accountReducer);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchRecipeDetails = async () => {
@@ -28,7 +34,8 @@ export default function RecipeDetail() {
                     const recipeData = await getRecipeById(recipeID);
                     setRecipe(recipeData);
                     if (recipeData.creator) {
-                        const creatorRecipes = await getRecipesByCreator(recipeData.creator);
+                        const creatorRecipes = await searchRecipesByCreator
+                        (recipeData.creator);
                         setRelatedRecipes(creatorRecipes.filter((r: Recipe) => r._id !== recipeID).slice(0, 3));
                     }
                 } catch (error) {
@@ -40,18 +47,20 @@ export default function RecipeDetail() {
     }, [recipeID]);
 
     const handleLike = async () => {
+        if (!currentUser) {
+            alert('Please log in to like a recipe.');
+            return;
+        }
+
         if (recipeID && recipe && !isLiking) {
             setIsLiking(true);
+            setError(null);
             try {
-                await incrementLikes(recipeID);
-                setRecipe(prevRecipe => {
-                    if (prevRecipe) {
-                        return {...prevRecipe, likes: prevRecipe.likes + 1};
-                    }
-                    return prevRecipe;
-                });
+                const updatedRecipe = await incrementLikes(recipeID);
+                setRecipe(updatedRecipe);
             } catch (error) {
                 console.error('Error incrementing likes:', error);
+                setError('Failed to like the recipe. Please try again.');
             } finally {
                 setIsLiking(false);
             }
@@ -82,7 +91,7 @@ export default function RecipeDetail() {
                     <button
                         onClick={handleLike}
                         className="btn btn-outline-danger me-3"
-                        disabled={isLiking}
+                        disabled={isLiking || !currentUser}
                     >
                         <FaHeart/> {recipe.likes}
                     </button>
@@ -105,7 +114,8 @@ export default function RecipeDetail() {
                     {relatedRecipes.map((relatedRecipe) => (
                         <div className="col" key={relatedRecipe._id}>
                             <div className="card h-100">
-                                <img src={relatedRecipe.imagePath} className="card-img-top" alt={relatedRecipe.name}/>
+                                <img src={relatedRecipe.imagePath} className="card-img-top"
+                                     alt={relatedRecipe.name}/>
                                 <div className="card-body">
                                     <h5 className="card-title">{relatedRecipe.name}</h5>
                                     <Link to={`/RecipeDetail/${relatedRecipe._id}`} className="btn btn-primary">View

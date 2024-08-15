@@ -1,6 +1,6 @@
 // File Path: src/Spark/Account/Session.tsx
 
-import * as client from "./client";
+import * as client from "./account-client";
 import {useEffect, useState} from "react";
 import {setCurrentUser} from "./reducer";
 import {useDispatch} from "react-redux";

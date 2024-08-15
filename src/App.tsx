@@ -13,9 +13,8 @@ function App() {
             <HashRouter>
                 <div>
                     <Routes>
-                        <Route path="/" element={<Navigate to="/Home"/>}/>
+                        <Route path="/" element={<Navigate to="Home"/>}/>
                         <Route path="/*" element={<Spark/>}/>
-
                     </Routes>
                 </div>
             </HashRouter>

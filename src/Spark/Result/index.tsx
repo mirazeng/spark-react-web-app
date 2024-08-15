@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useSearchParams, useLocation } from 'react-router-dom';
-import * as client from "../client";
+import * as client from "../recipe-client";
 
 interface Recipe {
     _id: string;
@@ -60,18 +60,18 @@ export default function SearchResults() {
                     >
                         <div className="d-flex w-100 justify-content-between">
                             <h5 className="mb-1">{recipe.name}</h5>
-                            <small>{recipe.likes} likes</small>
+                            <small className="text-danger">{recipe.likes} likes</small>
                         </div>
                         <div className="d-flex">
                             <img
                                 src={recipe.imagePath}
                                 alt={recipe.name}
-                                className="mr-3"
+                                className="me-3"
                                 style={{width: '100px', height: '100px', objectFit: 'cover'}}
                             />
-                            <div>
-                                <p className="mb-1">{recipe.description}</p>
-                                <small>Created by: {recipe.creator}</small>
+                            <div className="d-flex flex-column justify-content-end" style={{flex: 1}}>
+                                <p className="mb-2">{recipe.description}</p>
+                                <small className="text-success">Created by: {recipe.creator}</small>
                             </div>
                         </div>
                     </Link>

@@ -36,3 +36,109 @@
     transform: rotate(360deg);
   }
 }
+
+
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap');
+.custom-name-font {
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  color: #333;
+  font-size: 2.5rem;
+}
+
+.profile-picture {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  object-fit: cover;
+  float: left;
+  margin-right: 20px;
+}
+
+.profile-info h2 {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+}
+
+.profile-info p {
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.profile-info p svg {
+  margin-right: 10px;
+}
+
+.edit-button {
+  margin-top: 10px;
+  padding: 5px 10px;
+  background-color: #f0f0f0;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.edit-button svg {
+  margin-right: 5px;
+}
+
+.profile-header {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+.profile-picture-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-right: 20px;
+}
+
+.profile-picture {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 10px;
+}
+
+.profile-info {
+  flex-grow: 1;
+}
+
+.profile-page-wrapper {
+  padding: 20px;
+}
+
+.follow-info {
+  display: flex;
+  justify-content: flex-start;
+  margin-top: 10px;
+  border-top: 1px solid #e0e0e0;
+  padding-top: 10px;
+}
+
+.follow-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-right: 20px;
+}
+
+.follow-count {
+  font-size: 18px;
+  font-weight: bold;
+  color: #DB7093;
+}
+
+.follow-label {
+  font-size: 14px;
+  color: #666;
+}
+
+
+

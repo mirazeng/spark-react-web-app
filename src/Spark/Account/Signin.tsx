@@ -2,7 +2,7 @@
 
 import React, {useState} from "react";
 import {Link, useNavigate} from "react-router-dom";
-import * as client from "./client";
+import * as client from "./account-client";
 import {useDispatch} from "react-redux";
 import {setCurrentUser} from "./reducer";
 
@@ -17,8 +17,7 @@ export default function Signin() {
         try {
             const currentUser = await client.signin(credentials);
             dispatch(setCurrentUser(currentUser));
-            /*TODO: Update here once Profile component is created*/
-            navigate("/Account/Profile");
+            navigate("/Account/Profile/self");
         } catch (err: any) {
             setError(err.response.data.message || "An error occurred during sign in");
         }
