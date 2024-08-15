@@ -133,7 +133,7 @@ function Navigation() {
 function Footer() {
     /* My Full name, link to frontend and backend GitHub repo */
     return (
-        <div className=" row mt-2 mx-5">
+        <div className=" row mt-5 mx-5">
             <hr/>
             <div className="row justify-content-center">
                 <div className="col-md-8">

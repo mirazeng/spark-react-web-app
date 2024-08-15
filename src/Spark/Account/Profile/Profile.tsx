@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {useNavigate, useParams, Link, useLocation} from 'react-router-dom';
+import {Link, useLocation, useNavigate, useParams} from 'react-router-dom';
 import {useDispatch, useSelector} from 'react-redux';
 import {setCurrentUser} from '../reducer';
 import * as client from '../account-client';
@@ -7,8 +7,7 @@ import RecipesView from './RecipesView';
 import BookmarksView from './BookmarksView';
 import FollowingUsersView from './FollowingUsersView';
 import FollowersView from './FollowersView';
-
-import {FaEdit} from 'react-icons/fa';
+import {FaEdit, FaSave} from 'react-icons/fa';
 
 export default function Profile() {
     const {username, tab} = useParams();
@@ -37,30 +36,6 @@ export default function Profile() {
         } catch (err: any) {
             console.log("DEBUG: Profile.tsx -> fetchProfile -> err", err);
             navigate("/Account/Signin");
-        }
-    };
-
-    const updateProfile = async () => {
-        try {
-            await client.updateProfile(editedProfile);
-            // dispatch(setCurrentUser(editedProfile));
-            setProfile(editedProfile);
-            setIsEditing(false);
-            fetchProfile();
-        } catch (err: any) {
-            console.log("DEBUG: Profile.tsx -> updateProfile -> err", err);
-        }
-    };
-
-
-    const deleteProfile = async () => {
-        if (window.confirm("Are you sure you want to delete this profile?")) {
-            try {
-                await client.deleteProfile(profile._id);
-                navigate("/Account/Signin");
-            } catch (err: any) {
-                console.log("DEBUG: Profile.tsx -> deleteProfile -> err", err);
-            }
         }
     };
 
@@ -117,7 +92,6 @@ export default function Profile() {
         }
     };
 
-
     const canEdit = (currentUser: any, profileUser: any) => {
         if (!currentUser || !profileUser) return false;
         return currentUser.role === 'ADMIN' || currentUser.username === profileUser.username;
@@ -135,64 +109,101 @@ export default function Profile() {
     const toggleEditing = () => {
         if (isEditing) {
             // If we're exiting edit mode, reset the editedProfile to the current profile
-            setEditedProfile(profile);
+            setEditedProfile(profile)
         }
         setIsEditing(!isEditing);
     };
 
-    const renderFollowInfo = () => (
-        !isAnonymous && (
-            <div className="follow-info">
-                <div className="follow-item">
-                    <span className="follow-count">{profile.followers?.length || 0}</span>
-                    <span className="follow-label fw-bold">Followers</span>
-                </div>
-                <div className="follow-item">
-                    <span className="follow-count">{profile.following?.length || 0}</span>
-                    <span className="follow-label fw-bold">Following</span>
-                </div>
-            </div>
-        )
-    );
+    const handleSaveProfile = async () => {
+        try {
+            await client.updateProfile(editedProfile);
+            setProfile(editedProfile);
+            setIsEditing(false);
+            alert("Profile updated successfully!");
+        } catch (error) {
+            alert("Failed to update profile. Please try again.");
+        }
+    };
 
 
-    const renderProfileHeader = () => (
-        <div className="profile-header">
-            <div className="profile-picture-container">
-                <img
-                    src={editedProfile.profilePicture || "/logo192.png"}
-                    alt="Profile"
-                    className="profile-picture"
-                />
-                {isEditable && (
-                    <button onClick={toggleEditing} className="edit-button">
-                        <FaEdit/> {isEditing ? 'Cancel Edit' : 'Edit Profile'}
-                    </button>
-                )}
-            </div>
-            <div className="profile-content">
-                <div className="profile-info">
-                    {isEditing && isEditable ? (
-                        <>
+    const renderFollowInfo = () => (!isAnonymous && (<div className="follow-info">
+        <div className="follow-item">
+            <span className="follow-count">{profile.followers?.length || 0}</span>
+            <span className="follow-label fw-bold">Followers</span>
+        </div>
+        <div className="follow-item">
+            <span className="follow-count">{profile.following?.length || 0}</span>
+            <span className="follow-label fw-bold">Following</span>
+        </div>
+    </div>));
+
+
+    const renderProfileHeader = () => (<div className="profile-header">
+        <div className="profile-picture-container">
+            <img
+                src={editedProfile.profilePicture || "/logo192.png"}
+                alt="Profile"
+                className="profile-picture"
+            />
+            {isEditable && (
+                <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
+                    <div className="row-1" style={{marginBottom: '5px'}}>
+                        <button onClick={toggleEditing} className="edit-button">
+                            <FaEdit/> {isEditing ? 'Cancel Edit' : 'Edit Profile'}
+                        </button>
+                    </div>
+                    {isEditing && (
+                        <div className="row-2">
+                            <button onClick={handleSaveProfile} className="edit-button">
+                                <FaSave/>Save Profile
+                            </button>
+                        </div>
+                    )}
+                </div>)}
+        </div>
+        <div className="profile-content">
+            <div className="profile-info">
+                {isEditing && isEditable ? (
+                    <div className="edit-form">
+                        <div>
+                            <label htmlFor="first_name">First Name: </label>
                             <input
                                 name="first_name"
                                 value={editedProfile.first_name}
                                 onChange={handleInputChange}
                                 placeholder="First Name"
                             />
+                        </div>
+                        <div>
+                            <label htmlFor="last_name">Last Name: </label>
                             <input
                                 name="last_name"
                                 value={editedProfile.last_name}
                                 onChange={handleInputChange}
                                 placeholder="Last Name"
                             />
+                        </div>
+                        <div>
+                            <label htmlFor="username">UserName: </label>
                             <input
                                 name="username"
                                 value={editedProfile.username}
                                 onChange={handleInputChange}
                                 placeholder="Username"
                             />
-                            {isAdmin && (
+                        </div>
+                        <div>
+                            <label htmlFor="password">Password: </label>
+                            <input
+                                name="password"
+                                value={editedProfile.password}
+                                onChange={handleInputChange}
+                                placeholder="Password"
+                            />
+                        </div>
+                        {isAdmin && (
+                            <div>
+                                <label htmlFor="role">Role: </label>
                                 <select
                                     name="role"
                                     value={editedProfile.role}
@@ -200,113 +211,143 @@ export default function Profile() {
                                 >
                                     <option value="USER">USER</option>
                                     <option value="VIP">VIP</option>
-                                    <option value="INFLUENCER">INFLUENCER</option>
                                     <option value="ADMIN">ADMIN</option>
                                 </select>
-                            )}
+                            </div>)}
+                        <div>
+                            <label htmlFor="gender">Gender: </label>
                             <input
                                 name="gender"
                                 value={editedProfile.gender}
                                 onChange={handleInputChange}
                                 placeholder="Gender"
                             />
+                        </div>
+                        <div>
+                            <label htmlFor="description">Description: </label>
                             <textarea
                                 name="description"
                                 value={editedProfile.description}
                                 onChange={handleInputChange}
                                 placeholder="Description"
                             />
+                        </div>
+                        <div>
+                            <label htmlFor="email">Email: </label>
                             <input
                                 name="email"
                                 value={editedProfile.email}
                                 onChange={handleInputChange}
                                 placeholder="Email"
                             />
+                        </div>
+                        <div>
+                            <label htmlFor="phone">Phone: </label>
                             <input
                                 name="phone"
                                 value={editedProfile.phone}
                                 onChange={handleInputChange}
                                 placeholder="Phone"
                             />
-                            <input
-                                name="dob"
-                                type="date"
-                                value={new Date(editedProfile.dob).toISOString().split('T')[0]}
-                                onChange={handleInputChange}
-                            />
-                        </>
-                    ) : (
-                        <>
-                            <h2>{profile.first_name} {profile.last_name}</h2>
-                            <p>Username: {profile.username}</p>
-                            <p>Role: {profile.role}</p>
-                            <p>Gender: {profile.gender}</p>
-                            <p>Description: {profile.description}</p>
-                            {!isAnonymous && (isOwnProfile || isAdmin) && (
-                                <>
-                                    <p>Email: {profile.email}</p>
-                                    <p>Phone: {profile.phone}</p>
-                                    <p>Date of Birth: {new Date(profile.dob).toLocaleDateString()}</p>
-                                </>
-                            )}
-                        </>
-                    )}
-                    {!isAnonymous && !isOwnProfile && (
-                        <button onClick={profile.followers?.includes(currentUser.username) ? unfollowUser : followUser}>
-                            {profile.followers?.includes(currentUser.username) ? 'Unfollow' : 'Follow'}
-                        </button>
-                    )}
-                    {renderFollowInfo()}
-                </div>
+                        </div>
+                    </div>) : (
+                    <div>
+                        <h2>{profile.first_name} {profile.last_name}</h2>
+                        <p>Username: {profile.username}</p>
+                        {!isAnonymous && (isOwnProfile || isAdmin) && (
+                            <div>
+                                <p>Password: {profile.password}</p>
+                                <p>Email: {profile.email}</p>
+                                <p>Phone: {profile.phone}</p>
+                            </div>)}
+                        <p>Role: {profile.role}</p>
+                        <p>Gender: {profile.gender}</p>
+                        <p>Description: {profile.description}</p>
+                    </div>)}
+                {!isAnonymous && !isOwnProfile && (<div className="pt-2 pb-2">
+                    <button
+                        onClick={profile.followers?.includes(currentUser.username) ? unfollowUser : followUser}
+                        style={{
+                            padding: '10px 20px',
+                            marginRight: '10px',
+                            backgroundColor: 'white',
+                            border: '1px solid #DB7093',
+                            borderRadius: '5px',
+                            cursor: 'pointer',
+                            color: '#DB7093',
+                        }}>
+                        {profile.followers?.includes(currentUser.username) ? 'Unfollow' : 'Follow'}
+                    </button>
+                </div>)}
+                {renderFollowInfo()}
             </div>
         </div>
-    );
+    </div>);
 
 
     const renderTabPane = () => {
         const tabs = ['Recipes', 'Bookmarks', 'Following', 'Followers'];
-        return (
-            !isAnonymous && (
-                <div className="tab-pane">
-                    {tabs.map((tabName) => (
-                        (tabName !== 'Bookmarks' || isOwnProfile || isAdmin) && (
-                            <Link
-                                key={tabName}
-                                to={`/Account/Profile/${isOwnProfile ? 'self' : profile.username}/${tabName}`}
-                                className={location.pathname.includes(tabName) ? 'active-tab' : ''}
-                            >
-                                {tabName}
-                            </Link>
-                        )
-                    ))}
-                </div>
-            )
-        );
+        return (!isAnonymous && (<div className="tab-pane"
+                                      style={{
+                                          display: 'flex',
+                                          justifyContent: 'flex-start',
+                                          marginTop: '20px',
+                                          marginLeft: '185px',
+                                          borderBottom: '1px solid #e0e0e0',
+                                          paddingBottom: '10px'
+                                      }}>
+            {tabs.map((tabName) => ((tabName !== 'Bookmarks' || isOwnProfile || isAdmin) && (<Link
+                key={tabName}
+                to={`/Account/Profile/${isOwnProfile ? 'self' : profile.username}/${tabName}`}
+                style={{
+                    padding: '10px 20px',
+                    marginRight: '10px',
+                    backgroundColor: location.pathname.includes(tabName) ? '#DB7093' : '#f0f0f0',
+                    border: 'none',
+                    borderRadius: '5px',
+                    cursor: 'pointer',
+                    textDecoration: 'none',
+                    color: location.pathname.includes(tabName) ? 'white' : '#333',
+                    fontWeight: 'bold'
+                }}
+                className={location.pathname.includes(tabName) ? 'active-tab' : ''}
+            >
+                {tabName}
+            </Link>)))}
+        </div>));
     };
 
 
-    const renderAdminUserList = () => (
-        isAdmin && (
-            <div className="admin-user-list">
-                <h3>All Users:</h3>
-                {allUsers.map(user => (
-                    <button key={user._id} onClick={() => navigate(`/Account/Profile/${user.username}`)}>
-                        {user.username}
-                    </button>
-                ))}
-            </div>
-        )
-    );
-
-    return (
-        <div className="profile-page-wrapper" style={{paddingLeft: '100px', paddingRight: '100px', paddingTop: '80px'}}>
-            {renderProfileHeader()}
-            {renderTabPane()}
-            {renderContent()}
-            {isOwnProfile && (
-                <button onClick={signout}>Sign out</button>
-            )}
-            {renderAdminUserList()}
+    const renderAdminUserList = () => (isAdmin && (<div className="admin-user-list mt-4">
+        <br/>
+        <h3>All Users:</h3>
+        <div className="d-flex flex-wrap justify-content-start align-items-center mt-3">
+            {allUsers.map(user => (<div
+                key={user._id}
+                className="user-preview m-2"
+                onClick={() => navigate(`/Account/Profile/${user.username}`)}>
+                <img
+                    src={user.profilePicture || "/logo192.png"}
+                    alt={user.username}
+                    className="rounded-circle"
+                    style={{
+                        width: '50px', height: '50px', objectFit: 'cover', border: '1px transparent solid'
+                    }}
+                    title={user.username}
+                />
+            </div>))}
         </div>
-    );
+    </div>));
+
+    return (<div className="profile-page-wrapper">
+        {renderProfileHeader()}
+        {renderTabPane()}
+        <div className="content-wrapper">
+            {renderContent()}
+        </div>
+        {renderAdminUserList()}
+        <br/>
+        <br/>
+        {isOwnProfile && (<button className="btn btn-lg btn-danger" onClick={signout}>Sign out</button>)}
+    </div>);
 }

@@ -64,22 +64,38 @@ const BookmarksView: React.FC<BookmarksViewProps> = ({username}) => {
     }
 
     return (
-        <div className="bookmarks-view">
+        <div className="bookmarks-view mt-4">
             <h3>Bookmarked Recipes</h3>
-            {bookmarks.length === 0 ? (
-                <p>No bookmarks found.</p>
-            ) : (
-                <div className="recipe-grid">
-                    {bookmarks.map((recipe: Recipe) => (
-                        <div key={recipe.idMeal} className="recipe-card">
-                            <img src={recipe.strMealThumb} alt={recipe.strMeal}/>
-                            <h4>{recipe.strMeal}</h4>
-                            <p>{recipe.strInstructions.substring(0, 100)}...</p>
-                            <Link to={`/RemoteRecipeDetail/${recipe.idMeal}`}>View Details</Link>
+            <br />
+            <div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3">
+                {bookmarks.length === 0 ? (
+                    <p>No bookmarks found.</p>
+                ) : (
+                    bookmarks.map((recipe: Recipe) => (
+                        <div className="col" key={recipe.idMeal}>
+                            <div className="card h-100 shadow-sm">
+                                <img src={recipe.strMealThumb}
+                                     className="card-img-top"
+                                     alt={recipe.strMeal}
+                                     style={{ height: '200px', objectFit: 'cover' }}
+                                />
+                                <div className="card-body p-2">
+                                    <h6 className="card-title mb-0">{recipe.strMeal}</h6>
+                                    <p className="card-text small text-muted mb-2"
+                                       style={{ height: '3em', overflow: 'hidden' }}>
+                                        {recipe.strInstructions}
+                                    </p>
+                                    <Link to={`/RemoteRecipeDetail/${recipe.idMeal}`}
+                                          className="btn btn-sm btn-outline-info">
+                                        View
+                                    </Link>
+                                </div>
+                                <br />
+                            </div>
                         </div>
-                    ))}
-                </div>
-            )}
+                    ))
+                )}
+            </div>
         </div>
     );
 };

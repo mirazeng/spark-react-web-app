@@ -46,18 +46,20 @@ export default function RemoteSearchResults() {
                     >
                         <div className="d-flex w-100 justify-content-between">
                             <h5 className="mb-1">{recipe.strMeal}</h5>
-                            <small>{recipe.strArea} - {recipe.strCategory}</small>
+                            <small className="text-danger">
+                                {recipe.strArea} - {recipe.strCategory}
+                            </small>
                         </div>
                         <div className="d-flex">
                             <img
                                 src={recipe.strMealThumb}
                                 alt={recipe.strMeal}
-                                className="mr-3"
+                                className="me-3"
                                 style={{width: '100px', height: '100px', objectFit: 'cover'}}
                             />
-                            <div>
-                                <p className="mb-1">Category: {recipe.strCategory}</p>
-                                <small>Area: {recipe.strArea}</small>
+                            <div className="d-flex flex-column justify-content-end" style={{flex: 1}}>
+                                <p className="mb-2">Category: {recipe.strCategory}</p>
+                                <small className="text-success">Area: {recipe.strArea}</small>
                             </div>
                         </div>
                     </Link>

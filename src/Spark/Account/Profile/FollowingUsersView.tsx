@@ -1,7 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import * as client from '../account-client'
 import {useNavigate} from "react-router-dom";
-import {cursorTo} from "node:readline";
 
 interface FollowingUsersViewProps {
     username: string;
@@ -38,29 +37,36 @@ const FollowingUsersView: React.FC<FollowingUsersViewProps> = ({username}) => {
     }
 
     return (
-        <div className="following-users-view">
+        <div className="following-users-view mt-4">
             <h3>Following</h3>
+            <br/>
             {following.length === 0 ? (
                 <p>Not following anyone yet.</p>
             ) : (
-                <ul className="user-list">
+                <div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3">
                     {following.map((user: any) => (
-                        <li key={user._id} className="user-item">
-                            <img
-                                onClick={() => handleProfilePictureClick(user)}
-                                src={user.profilePicture || '/default-avatar.png'}
-                                alt={user.username}
-                                className="user-avatar"
-                                style={{cursor:"pointer"}}/>
-                            <span>
-                                <button key={user.username}
-                                        onClick={() => navigate(`/Account/Profile/${user.username}`)}>
-                                    {user.username}
-                                </button>
-                            </span>
-                        </li>
+                        <div key={user._id} className="user-item col">
+                            <div className="card h-100 shadow-sm">
+                                <img
+                                    onClick={() => handleProfilePictureClick(user)}
+                                    src={user.profilePicture || '/default-avatar.png'}
+                                    alt={user.username}
+                                    className="user-avatar card-img-top"
+                                    style={{cursor: "pointer", height: '200px', objectFit: 'cover'}}/>
+                                <span>
+                                    <div className="card-body p-2">
+                                        <button
+                                            className="card-title mb-0 btn btn-outline-dark"
+                                            key={user.username}
+                                            onClick={() => navigate(`/Account/Profile/${user.username}`)}>
+                                        {user.username}
+                                        </button>
+                                    </div>
+                                </span>
+                            </div>
+                        </div>
                     ))}
-                </ul>
+                </div>
             )}
         </div>
     );

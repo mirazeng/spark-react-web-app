@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
-import {Link, useNavigate, useParams} from 'react-router-dom';
-import {FaHeart, FaClock, FaBookmark} from 'react-icons/fa';
+import {Link, useParams} from 'react-router-dom';
+import { FaClock, FaBookmark} from 'react-icons/fa';
 import * as client from '../recipe-client';
 
 interface RemoteRecipe {
@@ -19,7 +19,6 @@ export default function RemoteRecipeDetail() {
     const [isBookmarked, setIsBookmarked] = useState(false);
     const [comments, setComments] = useState<any[]>([]);
     const [newComment, setNewComment] = useState('');
-    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchRecipeDetails = async () => {

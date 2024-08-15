@@ -109,17 +109,23 @@ export default function RecipeDetail() {
             </div>
 
             <div className="row">
-                <h3>More from {recipe.creator}</h3>
-                <div className="row row-cols-1 row-cols-md-3 g-4">
+                <h3>More from {recipe.creator}...</h3>
+                <div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3">
                     {relatedRecipes.map((relatedRecipe) => (
                         <div className="col" key={relatedRecipe._id}>
-                            <div className="card h-100">
-                                <img src={relatedRecipe.imagePath} className="card-img-top"
-                                     alt={relatedRecipe.name}/>
-                                <div className="card-body">
-                                    <h5 className="card-title">{relatedRecipe.name}</h5>
-                                    <Link to={`/RecipeDetail/${relatedRecipe._id}`} className="btn btn-primary">View
-                                        Recipe</Link>
+                            <div className="card h-100 shadow-sm">
+                                <img src={relatedRecipe.imagePath}
+                                     className="card-img-top"
+                                     alt={relatedRecipe.name}
+                                     style={{height: '200px', objectFit: 'cover'}}
+                                />
+                                <div className="card-body p-2">
+                                    <h6 className="card-title mb-0">{relatedRecipe.name}</h6>
+
+                                    <Link to={`/RecipeDetail/${relatedRecipe._id}`}
+                                          className="btn btn-sm btn-outline-info mt-4">
+                                        View Recipe
+                                    </Link>
                                 </div>
                             </div>
                         </div>

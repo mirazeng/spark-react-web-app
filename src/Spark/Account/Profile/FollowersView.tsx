@@ -37,29 +37,36 @@ const FollowersView: React.FC<FollowersViewProps> = ({username}) => {
     }
 
     return (
-        <div className="followers-view">
+        <div className="followers-view mt-4">
             <h3>Followers</h3>
+            <br/>
             {followers.length === 0 ? (
                 <p>No followers yet.</p>
             ) : (
-                <ul className="user-list">
+                <div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3">
                     {followers.map((user: any) => (
-                        <li key={user._id} className="user-item">
-                            <img
-                                onClick={() => handleProfilePictureClick(user)}
-                                src={user.profilePicture || '/default-avatar.png'}
-                                alt={user.username}
-                                className="user-avatar"
-                                style={{cursor: "pointer"}}/>
-                            <span>
-                                <button key={user.username} onClick={() => navigate
-                                (`/Account/Profile/${user.username}`)}>
-                                    {user.username}
-                                </button>
+                        <div key={user._id} className="user-item col">
+                            <div className="card h-100 shadow-sm">
+                                <img
+                                    onClick={() => handleProfilePictureClick(user)}
+                                    src={user.profilePicture || '/default-avatar.png'}
+                                    alt={user.username}
+                                    className="user-avatar card-img-top"
+                                    style={{cursor: "pointer", height: '200px', objectFit: 'cover'}}/>
+                                <span>
+                                  <div className="card-body p-2">
+                                    <button className="card-title mb-0 btn btn-outline-dark"
+                                            key={user.username}
+                                            onClick={() => navigate
+                                            (`/Account/Profile/${user.username}`)}>
+                                        {user.username}
+                                    </button>
+                                  </div>
                             </span>
-                        </li>
+                            </div>
+                        </div>
                     ))}
-                </ul>
+                </div>
             )}
         </div>
     );
